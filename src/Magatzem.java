@@ -1,7 +1,9 @@
 class Magatzem {
+
     private static final String FORMATGE = "Formatge Gidurat";
     private static final String ENTRADES = "Entrades per al Concert del Trobador";
     private static final String MARTELL = "Martell de Thor (Llegendari)";
+
     Article[] articles;
 
     public Magatzem(Article[] articles) {
@@ -9,55 +11,88 @@ class Magatzem {
     }
 
     public void actualitzarEstat() {
-        for (int i = 0; i < articles.length; i++) {
-            if (!articles[i].nom.equals("FORMATGE")
-                    && !articles[i].nom.equals("ENTRADES")) {
-                if (articles[i].qualitat > 0) {
-                    if (!articles[i].nom.equals("MARTELL")) {
-                        articles[i].qualitat = articles[i].qualitat - 1;
-                    }
-                }
-            } else {
-                if (articles[i].qualitat < 50) {
-                    articles[i].qualitat = articles[i].qualitat + 1;
-
-                    if (articles[i].nom.equals("ENTRADES")) {
-                        if (articles[i].diesPerVendre < 11) {
-                            if (articles[i].qualitat < 50) {
-                                articles[i].qualitat = articles[i].qualitat + 1;
-                            }
-                        }
-
-                        if (articles[i].diesPerVendre < 6) {
-                            if (articles[i].qualitat < 50) {
-                                articles[i].qualitat = articles[i].qualitat + 1;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!articles[i].nom.equals("MARTELL")) {
-                articles[i].diesPerVendre = articles[i].diesPerVendre - 1;
-            }
-
-            if (articles[i].diesPerVendre < 0) {
-                if (!articles[i].nom.equals("FORMATGE")) {
-                    if (!articles[i].nom.equals("ENTRADES")) {
-                        if (articles[i].qualitat > 0) {
-                            if (!articles[i].nom.equals("MARTELL")) {
-                                articles[i].qualitat = articles[i].qualitat - 1;
-                            }
-                        }
-                    } else {
-                        articles[i].qualitat = articles[i].qualitat - articles[i].qualitat;
-                    }
-                } else {
-                    if (articles[i].qualitat < 50) {
-                        articles[i].qualitat = articles[i].qualitat + 1;
-                    }
-                }
-            }
+        for (Article article : articles) {
+            actualitzarArticle(article);
         }
+    }
+
+    private void actualitzarArticle(Article article) {
+
+        if (esLegendari(article)) {
+            return;
+        }
+
+        actualitzarQualitat(article);
+        actualitzarDies(article);
+
+        if (article.diesPerVendre < 0) {
+            aplicarCaducitat(article);
+        }
+    }
+
+    private void actualitzarQualitat(Article article) {
+
+        if (esFormatge(article)) {
+            if (article.qualitat < 50) {
+                article.qualitat++;
+            }
+            return;
+        }
+
+        if (esEntrada(article)) {
+            if (article.qualitat < 50) {
+                article.qualitat++;
+
+                if (article.diesPerVendre < 11) {
+                    article.qualitat++;
+                }
+
+                if (article.diesPerVendre < 6) {
+                    article.qualitat++;
+                }
+            }
+            return;
+        }
+
+        if (article.qualitat > 0) {
+            article.qualitat--;
+        }
+    }
+
+    private void actualitzarDies(Article article) {
+        if (!esLegendari(article)) {
+            article.diesPerVendre--;
+        }
+    }
+
+    private void aplicarCaducitat(Article article) {
+
+        if (esFormatge(article)) {
+            if (article.qualitat < 50) {
+                article.qualitat++;
+            }
+            return;
+        }
+
+        if (esEntrada(article)) {
+            article.qualitat = 0;
+            return;
+        }
+
+        if (article.qualitat > 0) {
+            article.qualitat--;
+        }
+    }
+
+    private boolean esFormatge(Article article) {
+        return article.nom.equals(FORMATGE);
+    }
+
+    private boolean esEntrada(Article article) {
+        return article.nom.equals(ENTRADES);
+    }
+
+    private boolean esLegendari(Article article) {
+        return article.nom.equals(MARTELL);
     }
 }
