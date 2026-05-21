@@ -1,5 +1,4 @@
-public class Article {
-
+class Article {
     public String nom;
     public int diesPerVendre;
     public int qualitat;
