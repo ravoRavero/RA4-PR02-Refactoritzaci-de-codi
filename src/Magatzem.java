@@ -15,33 +15,75 @@ class Magatzem {
     public void actualitzarEstat() {
 
         for (Article article : articles) {
-
             processarArticle(article);
         }
     }
 
     private void processarArticle(Article article) {
 
-        if (esArticleNormal(article)) {
-            degradarArticleNormal(article);
-        } else {
-            millorarArticle(article);
+        if (esLegendari(article)) {
+            return;
         }
 
-        if (!esLegendari(article)) {
-            article.diesPerVendre--;
-        }
+        actualitzarQualitat(article);
+        actualitzarDies(article);
 
         if (estaCaducat(article)) {
-            aplicarEfectesCaducitat(article);
+            aplicarCaducitat(article);
         }
+    }
+
+    private void actualitzarQualitat(Article article) {
+
+        if (esFormatge(article)) {
+            millorarFormatge(article);
+            return;
+        }
+
+        if (esEntrada(article)) {
+            actualitzarEntrades(article);
+            return;
+        }
+
+        degradarArticleNormal(article);
+    }
+
+    private void millorarFormatge(Article article) {
+
+        if (article.qualitat < MAX_QUALITAT) {
+            article.qualitat++;
+        }
+    }
+
+    private void actualitzarEntrades(Article article) {
+
+        if (article.qualitat < MAX_QUALITAT) {
+
+            article.qualitat++;
+
+            if (article.diesPerVendre <= LIMIT_ENTRADES_10_DIES) {
+                if (article.qualitat < MAX_QUALITAT) {
+                    article.qualitat++;
+                }
+            }
+
+            if (article.diesPerVendre <= LIMIT_ENTRADES_5_DIES) {
+                if (article.qualitat < MAX_QUALITAT) {
+                    article.qualitat++;
+                }
+            }
+        }
+    }
+
+    private void actualitzarDies(Article article) {
+        article.diesPerVendre--;
     }
 
     private boolean estaCaducat(Article article) {
         return article.diesPerVendre < 0;
     }
 
-    private void aplicarEfectesCaducitat(Article article) {
+    private void aplicarCaducitat(Article article) {
 
         if (esFormatge(article)) {
 
@@ -49,15 +91,16 @@ class Magatzem {
                 article.qualitat++;
             }
 
-        } else if (esEntrada(article)) {
+            return;
+        }
 
+        if (esEntrada(article)) {
             article.qualitat = 0;
+            return;
+        }
 
-        } else {
-
-            if (potDegradar(article)) {
-                article.qualitat--;
-            }
+        if (potDegradar(article)) {
+            article.qualitat--;
         }
     }
 
@@ -84,35 +127,7 @@ class Magatzem {
     private void degradarArticleNormal(Article article) {
 
         if (article.qualitat > QUALITAT_MINIMA) {
-
-            if (!esLegendari(article)) {
-                article.qualitat--;
-            }
-        }
-    }
-
-    private void millorarArticle(Article article) {
-
-        if (article.qualitat < MAX_QUALITAT) {
-
-            article.qualitat++;
-
-            if (esEntrada(article)) {
-
-                if (article.diesPerVendre <= LIMIT_ENTRADES_10_DIES) {
-
-                    if (article.qualitat < MAX_QUALITAT) {
-                        article.qualitat++;
-                    }
-                }
-
-                if (article.diesPerVendre <= LIMIT_ENTRADES_5_DIES) {
-
-                    if (article.qualitat < MAX_QUALITAT) {
-                        article.qualitat++;
-                    }
-                }
-            }
+            article.qualitat--;
         }
     }
 }
