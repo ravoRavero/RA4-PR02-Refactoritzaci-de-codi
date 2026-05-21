@@ -22,10 +22,15 @@ class Magatzem {
             actualitzarQualitat(article);
             article.diesPerVendre--;
 
-            if (article.diesPerVendre < 0) {
+            if (estaCaducat(article)) {
                 aplicarCaducitat(article);
             }
         }
+    }
+
+    // 🔥 EXTRACT VARIABLE
+    private boolean estaCaducat(Article article) {
+        return article.diesPerVendre < 0;
     }
 
     private void actualitzarQualitat(Article article) {
@@ -43,7 +48,6 @@ class Magatzem {
         degradarNormal(article);
     }
 
-    // 🔥 EXTRACT METHOD (RESCAT 1)
     private void augmentarQualitatSiPossible(Article article) {
         if (article.qualitat < MAX_QUALITAT) {
             article.qualitat++;
@@ -56,16 +60,15 @@ class Magatzem {
 
             article.qualitat++;
 
-            if (article.diesPerVendre <= LIMIT_ENTRADES_10_DIES) {
-                if (article.qualitat < MAX_QUALITAT) {
-                    article.qualitat++;
-                }
+            boolean periodeAlt = article.diesPerVendre <= LIMIT_ENTRADES_10_DIES;
+            boolean periodeBaix = article.diesPerVendre <= LIMIT_ENTRADES_5_DIES;
+
+            if (periodeAlt && article.qualitat < MAX_QUALITAT) {
+                article.qualitat++;
             }
 
-            if (article.diesPerVendre <= LIMIT_ENTRADES_5_DIES) {
-                if (article.qualitat < MAX_QUALITAT) {
-                    article.qualitat++;
-                }
+            if (periodeBaix && article.qualitat < MAX_QUALITAT) {
+                article.qualitat++;
             }
         }
     }
