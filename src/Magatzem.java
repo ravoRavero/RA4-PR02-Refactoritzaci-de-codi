@@ -14,23 +14,55 @@ class Magatzem {
 
     public void actualitzarEstat() {
 
-        for (int i = 0; i < articles.length; i++) {
+        for (Article article : articles) {
 
-            Article article = articles[i];
-
-            if (esArticleNormal(article)) {
-                degradarArticleNormal(article);
-
-            } else {
-                millorarArticle(article);
-            }
-
-            if (!esLegendari(article)) {
-                article.diesPerVendre--;
-            }
-
-            aplicarCaducitat(article);
+            processarArticle(article);
         }
+    }
+
+    private void processarArticle(Article article) {
+
+        if (esArticleNormal(article)) {
+            degradarArticleNormal(article);
+        } else {
+            millorarArticle(article);
+        }
+
+        if (!esLegendari(article)) {
+            article.diesPerVendre--;
+        }
+
+        if (estaCaducat(article)) {
+            aplicarEfectesCaducitat(article);
+        }
+    }
+
+    private boolean estaCaducat(Article article) {
+        return article.diesPerVendre < 0;
+    }
+
+    private void aplicarEfectesCaducitat(Article article) {
+
+        if (esFormatge(article)) {
+
+            if (article.qualitat < MAX_QUALITAT) {
+                article.qualitat++;
+            }
+
+        } else if (esEntrada(article)) {
+
+            article.qualitat = 0;
+
+        } else {
+
+            if (potDegradar(article)) {
+                article.qualitat--;
+            }
+        }
+    }
+
+    private boolean potDegradar(Article article) {
+        return article.qualitat > QUALITAT_MINIMA && !esLegendari(article);
     }
 
     private boolean esArticleNormal(Article article) {
@@ -79,29 +111,6 @@ class Magatzem {
                     if (article.qualitat < MAX_QUALITAT) {
                         article.qualitat++;
                     }
-                }
-            }
-        }
-    }
-
-    private void aplicarCaducitat(Article article) {
-
-        if (article.diesPerVendre < 0) {
-
-            if (esFormatge(article)) {
-
-                if (article.qualitat < MAX_QUALITAT) {
-                    article.qualitat++;
-                }
-
-            } else if (esEntrada(article)) {
-
-                article.qualitat = 0;
-
-            } else {
-
-                if (article.qualitat > QUALITAT_MINIMA && !esLegendari(article)) {
-                    article.qualitat--;
                 }
             }
         }
