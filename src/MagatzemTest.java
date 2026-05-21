@@ -33,3 +33,4 @@ class MagatzemTest {
         assertEquals(10, art[0].diesPerVendre, "Els dies del Martell no han de canviar");
     }
 }
+f

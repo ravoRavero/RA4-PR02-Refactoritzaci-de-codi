@@ -1,10 +1,9 @@
 class Magatzem {
 
     private static final int MAX_QUALITAT = 50;
-    private static final int QUALITAT_LEGENDARIA = 80;
+    private static final int QUALITAT_MINIMA = 0;
     private static final int LIMIT_ENTRADES_10_DIES = 10;
     private static final int LIMIT_ENTRADES_5_DIES = 5;
-    private static final int QUALITAT_MINIMA = 0;
 
     Article[] articles;
 
@@ -26,7 +25,7 @@ class Magatzem {
         }
 
         actualitzarQualitat(article);
-        actualitzarDies(article);
+        article.diesPerVendre--;
 
         if (estaCaducat(article)) {
             aplicarCaducitat(article);
@@ -45,11 +44,10 @@ class Magatzem {
             return;
         }
 
-        degradarArticleNormal(article);
+        degradarNormal(article);
     }
 
     private void millorarFormatge(Article article) {
-
         if (article.qualitat < MAX_QUALITAT) {
             article.qualitat++;
         }
@@ -58,7 +56,6 @@ class Magatzem {
     private void actualitzarEntrades(Article article) {
 
         if (article.qualitat < MAX_QUALITAT) {
-
             article.qualitat++;
 
             if (article.diesPerVendre <= LIMIT_ENTRADES_10_DIES) {
@@ -75,12 +72,10 @@ class Magatzem {
         }
     }
 
-    private void actualitzarDies(Article article) {
-        article.diesPerVendre--;
-    }
-
-    private boolean estaCaducat(Article article) {
-        return article.diesPerVendre < 0;
+    private void degradarNormal(Article article) {
+        if (article.qualitat > QUALITAT_MINIMA) {
+            article.qualitat--;
+        }
     }
 
     private void aplicarCaducitat(Article article) {
@@ -90,7 +85,6 @@ class Magatzem {
             if (article.qualitat < MAX_QUALITAT) {
                 article.qualitat++;
             }
-
             return;
         }
 
@@ -99,17 +93,13 @@ class Magatzem {
             return;
         }
 
-        if (potDegradar(article)) {
+        if (article.qualitat > QUALITAT_MINIMA) {
             article.qualitat--;
         }
     }
 
-    private boolean potDegradar(Article article) {
-        return article.qualitat > QUALITAT_MINIMA && !esLegendari(article);
-    }
-
-    private boolean esArticleNormal(Article article) {
-        return !esFormatge(article) && !esEntrada(article);
+    private boolean estaCaducat(Article article) {
+        return article.diesPerVendre < 0;
     }
 
     private boolean esFormatge(Article article) {
@@ -122,12 +112,5 @@ class Magatzem {
 
     private boolean esLegendari(Article article) {
         return article.nom.equals("Martell de Thor (Llegendari)");
-    }
-
-    private void degradarArticleNormal(Article article) {
-
-        if (article.qualitat > QUALITAT_MINIMA) {
-            article.qualitat--;
-        }
     }
 }
