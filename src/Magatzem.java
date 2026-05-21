@@ -18,77 +18,90 @@ class Magatzem {
 
             Article article = articles[i];
 
-            boolean esFormatge =
-                    article.nom.equals("Formatge Gidurat");
+            if (esArticleNormal(article)) {
+                degradarArticleNormal(article);
 
-            boolean esEntrada =
-                    article.nom.equals("Entrades per al Concert del Trobador");
+            } else {
+                millorarArticle(article);
+            }
 
-            boolean esLegendari =
-                    article.nom.equals("Martell de Thor (Llegendari)");
+            if (!esLegendari(article)) {
+                article.diesPerVendre--;
+            }
 
-            if (!esFormatge && !esEntrada) {
+            aplicarCaducitat(article);
+        }
+    }
 
-                if (article.qualitat > QUALITAT_MINIMA) {
+    private boolean esArticleNormal(Article article) {
+        return !esFormatge(article) && !esEntrada(article);
+    }
 
-                    if (!esLegendari) {
-                        article.qualitat = article.qualitat - 1;
+    private boolean esFormatge(Article article) {
+        return article.nom.equals("Formatge Gidurat");
+    }
+
+    private boolean esEntrada(Article article) {
+        return article.nom.equals("Entrades per al Concert del Trobador");
+    }
+
+    private boolean esLegendari(Article article) {
+        return article.nom.equals("Martell de Thor (Llegendari)");
+    }
+
+    private void degradarArticleNormal(Article article) {
+
+        if (article.qualitat > QUALITAT_MINIMA) {
+
+            if (!esLegendari(article)) {
+                article.qualitat--;
+            }
+        }
+    }
+
+    private void millorarArticle(Article article) {
+
+        if (article.qualitat < MAX_QUALITAT) {
+
+            article.qualitat++;
+
+            if (esEntrada(article)) {
+
+                if (article.diesPerVendre <= LIMIT_ENTRADES_10_DIES) {
+
+                    if (article.qualitat < MAX_QUALITAT) {
+                        article.qualitat++;
                     }
                 }
+
+                if (article.diesPerVendre <= LIMIT_ENTRADES_5_DIES) {
+
+                    if (article.qualitat < MAX_QUALITAT) {
+                        article.qualitat++;
+                    }
+                }
+            }
+        }
+    }
+
+    private void aplicarCaducitat(Article article) {
+
+        if (article.diesPerVendre < 0) {
+
+            if (esFormatge(article)) {
+
+                if (article.qualitat < MAX_QUALITAT) {
+                    article.qualitat++;
+                }
+
+            } else if (esEntrada(article)) {
+
+                article.qualitat = 0;
 
             } else {
 
-                if (article.qualitat < MAX_QUALITAT) {
-
-                    article.qualitat = article.qualitat + 1;
-
-                    if (esEntrada) {
-
-                        if (article.diesPerVendre <= LIMIT_ENTRADES_10_DIES) {
-
-                            if (article.qualitat < MAX_QUALITAT) {
-                                article.qualitat = article.qualitat + 1;
-                            }
-                        }
-
-                        if (article.diesPerVendre <= LIMIT_ENTRADES_5_DIES) {
-
-                            if (article.qualitat < MAX_QUALITAT) {
-                                article.qualitat = article.qualitat + 1;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!esLegendari) {
-                article.diesPerVendre = article.diesPerVendre - 1;
-            }
-
-            if (article.diesPerVendre < 0) {
-
-                if (!esFormatge) {
-
-                    if (!esEntrada) {
-
-                        if (article.qualitat > QUALITAT_MINIMA) {
-
-                            if (!esLegendari) {
-                                article.qualitat = article.qualitat - 1;
-                            }
-                        }
-
-                    } else {
-
-                        article.qualitat =
-                                article.qualitat - article.qualitat;
-                    }
-
-                } else {
-
-                    if (article.qualitat < MAX_QUALITAT) {
-                        article.qualitat = article.qualitat + 1;
-                    }
+                if (article.qualitat > QUALITAT_MINIMA && !esLegendari(article)) {
+                    article.qualitat--;
                 }
             }
         }
