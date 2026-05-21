@@ -14,28 +14,24 @@ class Magatzem {
     public void actualitzarEstat() {
 
         for (Article article : articles) {
-            processarArticle(article);
-        }
-    }
 
-    private void processarArticle(Article article) {
+            if (esLegendari(article)) {
+                continue;
+            }
 
-        if (esLegendari(article)) {
-            return;
-        }
+            actualitzarQualitat(article);
+            article.diesPerVendre--;
 
-        actualitzarQualitat(article);
-        article.diesPerVendre--;
-
-        if (estaCaducat(article)) {
-            aplicarCaducitat(article);
+            if (article.diesPerVendre < 0) {
+                aplicarCaducitat(article);
+            }
         }
     }
 
     private void actualitzarQualitat(Article article) {
 
         if (esFormatge(article)) {
-            millorarFormatge(article);
+            augmentarQualitatSiPossible(article);
             return;
         }
 
@@ -47,7 +43,8 @@ class Magatzem {
         degradarNormal(article);
     }
 
-    private void millorarFormatge(Article article) {
+    // 🔥 EXTRACT METHOD (RESCAT 1)
+    private void augmentarQualitatSiPossible(Article article) {
         if (article.qualitat < MAX_QUALITAT) {
             article.qualitat++;
         }
@@ -56,6 +53,7 @@ class Magatzem {
     private void actualitzarEntrades(Article article) {
 
         if (article.qualitat < MAX_QUALITAT) {
+
             article.qualitat++;
 
             if (article.diesPerVendre <= LIMIT_ENTRADES_10_DIES) {
@@ -81,10 +79,7 @@ class Magatzem {
     private void aplicarCaducitat(Article article) {
 
         if (esFormatge(article)) {
-
-            if (article.qualitat < MAX_QUALITAT) {
-                article.qualitat++;
-            }
+            augmentarQualitatSiPossible(article);
             return;
         }
 
@@ -96,10 +91,6 @@ class Magatzem {
         if (article.qualitat > QUALITAT_MINIMA) {
             article.qualitat--;
         }
-    }
-
-    private boolean estaCaducat(Article article) {
-        return article.diesPerVendre < 0;
     }
 
     private boolean esFormatge(Article article) {
