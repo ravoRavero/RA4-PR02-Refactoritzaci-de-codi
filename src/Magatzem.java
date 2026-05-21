@@ -28,9 +28,13 @@ class Magatzem {
         }
     }
 
-    // 🔥 EXTRACT VARIABLE
     private boolean estaCaducat(Article article) {
         return article.diesPerVendre < 0;
+    }
+
+    // 🔥 DECOMPOSE CONDITIONAL
+    private boolean potDegradar(Article article) {
+        return article.qualitat > QUALITAT_MINIMA && !esLegendari(article);
     }
 
     private void actualitzarQualitat(Article article) {
@@ -60,21 +64,22 @@ class Magatzem {
 
             article.qualitat++;
 
-            boolean periodeAlt = article.diesPerVendre <= LIMIT_ENTRADES_10_DIES;
-            boolean periodeBaix = article.diesPerVendre <= LIMIT_ENTRADES_5_DIES;
-
-            if (periodeAlt && article.qualitat < MAX_QUALITAT) {
-                article.qualitat++;
+            if (article.diesPerVendre <= LIMIT_ENTRADES_10_DIES) {
+                if (article.qualitat < MAX_QUALITAT) {
+                    article.qualitat++;
+                }
             }
 
-            if (periodeBaix && article.qualitat < MAX_QUALITAT) {
-                article.qualitat++;
+            if (article.diesPerVendre <= LIMIT_ENTRADES_5_DIES) {
+                if (article.qualitat < MAX_QUALITAT) {
+                    article.qualitat++;
+                }
             }
         }
     }
 
     private void degradarNormal(Article article) {
-        if (article.qualitat > QUALITAT_MINIMA) {
+        if (potDegradar(article)) {
             article.qualitat--;
         }
     }
@@ -91,7 +96,7 @@ class Magatzem {
             return;
         }
 
-        if (article.qualitat > QUALITAT_MINIMA) {
+        if (potDegradar(article)) {
             article.qualitat--;
         }
     }
